@@ -2,6 +2,11 @@ import csv, os
 
 __location__ = os.path.realpath(
     os.path.join(os.getcwd(), os.path.dirname(__file__)))
+movie =[]
+with open(os.path.join(__location__, 'movies.csv')) as f:
+    rows = csv.DictReader(f)
+    for r in rows:
+        movie.append(dict(r))
 
 class DB:
     def __init__(self):
@@ -97,6 +102,27 @@ class Table:
             pivot_table.append([item, aggregate_val_list])
         return pivot_table
 
+    def insert_row(self, dict):
+        self.table.append(dict)
+
+    def update_row(self, primary_attribute, primary_attribute_value, update_attribute, update_value):
+        pass
+
     def __str__(self):
         return self.table_name + ':' + str(self.table)
+
+
+my_db = DB()
+movie_table = Table('movie', movie)
+my_db.insert(movie_table)
+comedy_table = movie_table.filter(lambda x: x['Genre'] == 'Comedy')
+comedy_table_gross = comedy_table.aggregate(lambda x: sum(x)/len(x), 'Worldwide Gross')
+drama_table = movie_table.filter(lambda x: x['Genre'] == 'Drama')
+drama_table_score = drama_table.aggregate(lambda x: min(x), 'Audience score %')
+print(comedy_table_gross)
+print(drama_table_score)
+fantasy_table = movie_table.filter(lambda x: x['Genre'] == 'Fantasy')
+fantasy_num = fantasy_table.aggregate(lambda x: len(x), 'Audience score %')
+print(fantasy_num)
+
 
